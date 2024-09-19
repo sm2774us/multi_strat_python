@@ -16,24 +16,24 @@ Provided below is comprehensive implementation of the multi-strategy approach, a
 ### Technical Explanation:
 We use the Johansen Cointegration Test to identify pairs of assets that exhibit long-term equilibrium relationships. The test is based on a Vector Error Correction Model (VECM):
 
-ΔYt = ΠYt-1 + Σ(Γi ΔYt-i) + εt
+$$ \Delta Y_t = \Pi Y_{t-1} + \sum_{i=1}^{p-1} \Gamma_i \Delta Y_{t-i} + \varepsilon_t $$
 
 Where:
-- Yt is a vector of time series
-- Π is the long-run impact matrix
-- Γi are short-run impact matrices
-- εt is a vector of innovations
+- $Y_t$ is a vector of time series
+- $\Pi$ is the long-run impact matrix
+- $\Gamma_i$ are short-run impact matrices
+- $\varepsilon_t$ is a vector of innovations
 
-The number of cointegrating relationships is determined by the rank of Π.
+The number of cointegrating relationships is determined by the rank of $\Pi$.
 
 We then use a Hidden Markov Model (HMM) to identify regime switches in the mean-reverting behavior:
 
-P(Ot | Qt) = N(μQt, σQt^2)
+$$ P(O_t | Q_t) = \mathcal{N}(\mu_{Q_t}, \sigma_{Q_t}^2) $$
 
 Where:
-- Ot is the observed spread at time t
-- Qt is the hidden state at time t
-- N(μ, σ^2) is a normal distribution with mean μ and variance σ^2
+- $O_t$ is the observed spread at time $t$
+- $Q_t$ is the hidden state at time $t$
+- $\mathcal{N}(\mu, \sigma^2)$ is a normal distribution with mean $\mu$ and variance $\sigma^2$
 
 ### Non-Technical Explanation:
 Mean reversion strategies exploit the tendency of certain asset pairs to maintain a stable relationship over time. We use statistical tests to find pairs of assets that move together in the long run. Then, we use a model that can detect when this relationship is temporarily out of balance, giving us opportunities to trade when we expect the relationship to return to normal.
@@ -43,14 +43,14 @@ Mean reversion strategies exploit the tendency of certain asset pairs to maintai
 ### Technical Explanation:
 We implement a Q-learning reinforcement learning algorithm to optimize entry and exit points. The Q-function is updated as:
 
-Q(st, at) ← Q(st, at) + α[rt+1 + γ max(Q(st+1, a)) - Q(st, at)]
+$$ Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha[r_{t+1} + \gamma \max_a(Q(s_{t+1}, a)) - Q(s_t, a_t)] $$
 
 Where:
-- st is the state at time t
-- at is the action at time t
-- rt+1 is the reward received
-- α is the learning rate
-- γ is the discount factor
+- $s_t$ is the state at time $t$
+- $a_t$ is the action at time $t$
+- $r_{t+1}$ is the reward received
+- $\alpha$ is the learning rate
+- $\gamma$ is the discount factor
 
 ### Non-Technical Explanation:
 Momentum strategies try to capture price trends in the market. We use a machine learning approach that learns from historical data to identify the best times to enter or exit trades based on market momentum. The model continuously updates its understanding of market behavior to improve its decisions over time.
@@ -60,12 +60,12 @@ Momentum strategies try to capture price trends in the market. We use a machine 
 ### Technical Explanation:
 We use a GARCH(1,1) model to forecast volatility:
 
-σt^2 = ω + α εt-1^2 + β σt-1^2
+$$ \sigma_t^2 = \omega + \alpha \varepsilon_{t-1}^2 + \beta \sigma_{t-1}^2 $$
 
 Where:
-- σt^2 is the variance at time t
-- εt-1^2 is the squared residual at t-1
-- ω, α, and β are parameters to be estimated
+- $\sigma_t^2$ is the variance at time $t$
+- $\varepsilon_{t-1}^2$ is the squared residual at $t-1$
+- $\omega$, $\alpha$, and $\beta$ are parameters to be estimated
 
 We then use a neural network to predict discrepancies between implied and realized volatility.
 
@@ -77,15 +77,14 @@ Volatility arbitrage strategies profit from differences between the market's exp
 ### Technical Explanation:
 We implement a sentiment analysis model using BERT (Bidirectional Encoder Representations from Transformers):
 
-P(sentiment | text) = softmax(W * BERT(text) + b)
+$$ P(\text{sentiment} | \text{text}) = \text{softmax}(W \cdot \text{BERT}(\text{text}) + b) $$
 
 Where:
-- BERT(text) is the BERT encoding of the input text
-- W and b are learned parameters
+- $\text{BERT}(\text{text})$ is the BERT encoding of the input text
+- $W$ and $b$ are learned parameters
 
 ### Non-Technical Explanation:
 Macro-driven strategies make trades based on broad economic factors. We use advanced natural language processing techniques to analyze news articles, economic reports, and central bank statements. This helps us understand the overall economic sentiment and make trading decisions based on this broader context.
-
 
 2. Python code for individual strategies
 
