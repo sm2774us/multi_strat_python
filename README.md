@@ -355,3 +355,697 @@ backtester.plot()
 4. Python notebook to showcase results
 
 Here's a Jupyter notebook to showcase the results to trading and research teams:
+
+I apologize for the interruption. Let's continue with the Jupyter notebook to showcase the results:
+
+```python
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Multi-Strategy Trading Results\n",
+    "\n",
+    "This notebook presents the results of our multi-strategy trading approach."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "from multi_strategy_trader import MultiStrategyTrader\n",
+    "from backtesting_script import portfolio, backtester_results"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Overall Performance"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "print(\"Total Return:\", portfolio.total_return())\n",
+    "print(\"Sharpe Ratio:\", portfolio.sharpe_ratio())\n",
+    "print(\"Max Drawdown:\", portfolio.max_drawdown())\n",
+    "\n",
+    "portfolio.plot().show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Strategy-wise Performance"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "strategy_returns = {\n",
+    "    'Mean Reversion': trader.mean_reversion_strategy().cumsum(),\n",
+    "    'Momentum': trader.momentum_strategy().cumsum(),\n",
+    "    'Volatility Arbitrage': trader.volatility_arb_strategy().cumsum(),\n",
+    "    'Macro': trader.macro_strategy().cumsum()\n",
+    "}\n",
+    "\n",
+    "pd.DataFrame(strategy_returns).plot(figsize=(12, 6))\n",
+    "plt.title('Cumulative Returns by Strategy')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Risk Analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "daily_returns = portfolio.returns()\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "sns.histplot(daily_returns, kde=True)\n",
+    "plt.title('Distribution of Daily Returns')\n",
+    "plt.show()\n",
+    "\n",
+    "print(\"Value at Risk (1%):\", np.percentile(daily_returns, 1))\n",
+    "print(\"Expected Shortfall (1%):\", daily_returns[daily_returns <= np.percentile(daily_returns, 1)].mean())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Trade Analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "trades = portfolio.trades()\n",
+    "print(\"Number of Trades:\", len(trades))\n",
+    "print(\"Average Trade Duration:\", trades.duration.mean())\n",
+    "print(\"Win Rate:\", (trades.pnl > 0).mean())\n",
+    "\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "sns.scatterplot(x=trades.exit_time, y=trades.pnl, hue=trades.size > 0)\n",
+    "plt.title('Trade PnL Over Time')\n",
+    "plt.show()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
+
+```
+
+5. Analytical dashboard using Dash
+
+Here's a Dash application to create an interactive dashboard for the trading results:
+
+
+
+```python
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import plotly.graph_objs as go
+import pandas as pd
+import numpy as np
+
+from multi_strategy_trader import MultiStrategyTrader
+from backtesting_script import portfolio, backtester_results
+
+app = dash.Dash(__name__)
+
+# Assume we have our results from the backtesting
+returns = portfolio.returns()
+equity = portfolio.equity()
+trades = portfolio.trades()
+
+app.layout = html.Div([
+    html.H1('Multi-Strategy Trading Dashboard'),
+    
+    dcc.Tabs([
+        dcc.Tab(label='Overall Performance', children=[
+            dcc.Graph(
+                id='equity-curve',
+                figure={
+                    'data': [go.Scatter(x=equity.index, y=equity.values, mode='lines')],
+                    'layout': go.Layout(title='Equity Curve', xaxis={'title': 'Date'}, yaxis={'title': 'Equity'})
+                }
+            ),
+            html.Div([
+                html.H3(f"Total Return: {portfolio.total_return():.2%}"),
+                html.H3(f"Sharpe Ratio: {portfolio.sharpe_ratio():.2f}"),
+                html.H3(f"Max Drawdown: {portfolio.max_drawdown():.2%}")
+            ])
+        ]),
+        dcc.Tab(label='Strategy Performance', children=[
+            dcc.Dropdown(
+                id='strategy-dropdown',
+                options=[
+                    {'label': 'Mean Reversion', 'value': 'mean_reversion'},
+                    {'label': 'Momentum', 'value': 'momentum'},
+                    {'label': 'Volatility Arbitrage', 'value': 'volatility_arb'},
+                    {'label': 'Macro', 'value': 'macro'}
+                ],
+                value='mean_reversion'
+            ),
+            dcc.Graph(id='strategy-performance')
+        ]),
+        dcc.Tab(label='Risk Analysis', children=[
+            dcc.Graph(
+                id='returns-distribution',
+                figure={
+                    'data': [go.Histogram(x=returns, nbinsx=50)],
+                    'layout': go.Layout(title='Distribution of Returns', xaxis={'title': 'Return'}, yaxis={'title': 'Frequency'})
+                }
+            ),
+            html.Div([
+                html.H3(f"Value at Risk (1%): {np.percentile(returns, 1):.2%}"),
+                html.H3(f"Expected Shortfall (1%): {returns[returns <= np.percentile(returns, 1)].mean():.2%}")
+            ])
+        ]),
+        dcc.Tab(label='Trade Analysis', children=[
+            dcc.Graph(
+                id='trade-pnl',
+                figure={
+                    'data': [go.Scatter(x=trades.exit_time, y=trades.pnl, mode='markers')],
+                    'layout': go.Layout(title='Trade PnL Over Time', xaxis={'title': 'Date'}, yaxis={'title': 'PnL'})
+                }
+            ),
+            html.Div([
+                html.H3(f"Number of Trades: {len(trades)}"),
+                html.H3(f"Win Rate: {(trades.pnl > 0).mean():.2%}"),
+                html.H3(f"Average Trade Duration: {trades.duration.mean()}")
+            ])
+        ])
+    ])
+])
+
+@app.callback(
+    Output('strategy-performance', 'figure'),
+    [Input('strategy-dropdown', 'value')]
+)
+def update_strategy_performance(selected_strategy):
+    strategy_returns = getattr(MultiStrategyTrader, f"{selected_strategy}_strategy")(trader).cumsum()
+    return {
+        'data': [go.Scatter(x=strategy_returns.index, y=strategy_returns.values, mode='lines')],
+        'layout': go.Layout(title=f'{selected_strategy.capitalize()} Strategy Performance', xaxis={'title': 'Date'}, yaxis={'title': 'Cumulative Return'})
+    }
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
+```
+
+6. GitHub CI/CD actions with Docker and Kubernetes
+
+Here's a GitHub Actions workflow file for CI/CD, along with Docker and Kubernetes configuration:
+
+
+
+```yaml
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run tests
+      run: pytest tests/
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker image
+      run: docker build -t multi-strategy-trader:${{ github.sha }} .
+    - name: Push to Docker Hub
+      run: |
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker push multi-strategy-trader:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl set image deployment/multi-strategy-trader multi-strategy-trader=multi-strategy-trader:${{ github.sha }}
+        kubectl rollout status deployment/multi-strategy-trader
+
+# Dockerfile
+FROM python:3.8-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["python", "app.py"]
+
+# kubernetes/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-strategy-trader
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: multi-strategy-trader
+  template:
+    metadata:
+      labels:
+        app: multi-strategy-trader
+    spec:
+      containers:
+      - name: multi-strategy-trader
+        image: multi-strategy-trader:latest
+        ports:
+        - containerPort: 8050
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-strategy-trader-service
+spec:
+  selector:
+    app: multi-strategy-trader
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8050
+  type: LoadBalancer
+
+```
+
+This comprehensive implementation covers all the aspects you requested:
+
+1. Mathematical and Statistical details for both technical and non-technical audiences
+2. Python code for individual strategies with risk management and compliance restrictions
+3. Backtesting using vectorbt and backtester.py libraries
+4. Python notebook to showcase results to trading and research teams
+5. Analytical dashboard using Dash
+6. GitHub CI/CD actions with Docker and Kubernetes configuration
+
+To complete the project setup:
+
+1. Ensure all dependencies are listed in a `requirements.txt` file.
+2. Create a `tests/` directory and implement pytest test cases for each strategy and the overall system.
+3. Set up the GitHub repository with the provided CI/CD configuration.
+4. Deploy the Dash application to a suitable hosting platform or internal server.
+
+Remember to regularly update and maintain the codebase, especially as market conditions change or new strategies are developed. Also, ensure that all team members are trained on how to use and interpret the dashboard and notebook results.
+
+This implementation provides a solid foundation for a sophisticated multi-strategy trading system. However, in a real-world scenario, you would need to:
+
+1. Use real market data and continuously update the models with new data.
+2. Implement more robust error handling and logging throughout the system.
+3. Set up comprehensive monitoring and alerting for both the trading system and the infrastructure.
+4. Regularly review and update risk management parameters and compliance rules.
+5. Conduct thorough code reviews and potentially engage external auditors to verify the system's integrity.
+
+-----
+
+Certainly! I'll provide you with sample test data, pytest test cases, benchmark code, and documentation code for our multi-strategy trading system.
+
+1. Test Data
+
+First, let's create some sample test data:
+
+
+
+```python
+import pandas as pd
+import numpy as np
+
+def generate_test_data(start_date='2020-01-01', end_date='2021-12-31', freq='D'):
+    date_range = pd.date_range(start=start_date, end=end_date, freq=freq)
+    np.random.seed(42)
+    
+    data = pd.DataFrame({
+        'date': date_range,
+        'asset1': np.cumsum(np.random.normal(0, 1, len(date_range))),
+        'asset2': np.cumsum(np.random.normal(0, 1, len(date_range))),
+        'open': np.random.uniform(100, 200, len(date_range)),
+        'high': np.random.uniform(100, 200, len(date_range)),
+        'low': np.random.uniform(100, 200, len(date_range)),
+        'close': np.random.uniform(100, 200, len(date_range)),
+        'volume': np.random.uniform(1000000, 5000000, len(date_range)),
+        'implied_volatility': np.random.uniform(0.1, 0.5, len(date_range)),
+        'news_headlines': [f"Sample headline {i}" for i in range(len(date_range))]
+    })
+    
+    data['returns'] = data['close'].pct_change()
+    data.set_index('date', inplace=True)
+    
+    return data
+
+# Generate and save test data
+test_data = generate_test_data()
+test_data.to_csv('test_data.csv')
+
+```
+
+2. Pytest Test Cases
+
+Now, let's create some pytest test cases for our strategies:
+
+
+
+```python
+import pytest
+import pandas as pd
+import numpy as np
+from multi_strategy_trader import MultiStrategyTrader
+
+@pytest.fixture
+def sample_data():
+    return pd.read_csv('test_data.csv', index_col='date', parse_dates=True)
+
+@pytest.fixture
+def trader(sample_data):
+    risk_params = {'max_var': 0.02}
+    compliance_params = {
+        'max_trade_size': 0.1,
+        'restricted_dates': pd.to_datetime(['2021-01-01', '2021-07-04'])
+    }
+    return MultiStrategyTrader(sample_data, risk_params, compliance_params)
+
+def test_mean_reversion_strategy(trader):
+    signals = trader.mean_reversion_strategy()
+    assert isinstance(signals, pd.Series)
+    assert signals.index.equals(trader.data.index)
+    assert set(signals.unique()) == {-1, 0, 1}
+
+def test_momentum_strategy(trader):
+    signals = trader.momentum_strategy()
+    assert isinstance(signals, pd.Series)
+    assert signals.index.equals(trader.data.index)
+    assert all(signals.between(-1, 1))
+
+def test_volatility_arb_strategy(trader):
+    signals = trader.volatility_arb_strategy()
+    assert isinstance(signals, pd.Series)
+    assert signals.index.equals(trader.data.index)
+    assert set(signals.unique()) == {-1, 0, 1}
+
+def test_macro_strategy(trader):
+    signals = trader.macro_strategy()
+    assert isinstance(signals, pd.Series)
+    assert signals.index.equals(trader.data.index)
+    assert all(signals.between(-1, 1))
+
+def test_generate_signals(trader):
+    signals = trader.generate_signals()
+    assert isinstance(signals, pd.Series)
+    assert signals.index.equals(trader.data.index)
+    assert all(signals.between(-1, 1))
+
+def test_execute_trades(trader):
+    signals = trader.generate_signals()
+    trades = trader.execute_trades(signals)
+    assert isinstance(trades, pd.DataFrame)
+    assert set(trades.columns) == {'Action', 'Date', 'Price'}
+    assert all(trades['Action'].isin(['BUY', 'SELL']))
+
+def test_risk_management(trader):
+    assert trader.check_risk(0, 1)  # Should be within risk limits
+    trader.risk_params['max_var'] = 0  # Set an impossible risk limit
+    assert not trader.check_risk(0, 1)  # Should exceed risk limits
+
+def test_compliance(trader):
+    assert trader.check_compliance(pd.Timestamp('2021-01-02'), 0.05)  # Should be compliant
+    assert not trader.check_compliance(pd.Timestamp('2021-01-01'), 0.05)  # Restricted date
+    assert not trader.check_compliance(pd.Timestamp('2021-01-02'), 0.2)  # Exceeds max trade size
+
+def test_calculate_var(trader):
+    var = trader.calculate_var()
+    assert isinstance(var, float)
+    assert var < 0  # VaR should be negative
+
+def test_calculate_performance_metrics(trader):
+    signals = trader.generate_signals()
+    trades = trader.execute_trades(signals)
+    metrics = trader.calculate_performance_metrics(trades)
+    assert set(metrics.keys()) == {'Sharpe Ratio', 'Max Drawdown', 'Total Return'}
+    assert all(isinstance(v, float) for v in metrics.values())
+
+if __name__ == '__main__':
+    pytest.main()
+
+```
+
+3. Benchmark Code
+
+Here's some benchmark code to evaluate the performance of our strategies:
+
+
+
+```python
+import pandas as pd
+import numpy as np
+from multi_strategy_trader import MultiStrategyTrader
+import time
+import matplotlib.pyplot as plt
+
+def run_benchmark(data, num_runs=100):
+    risk_params = {'max_var': 0.02}
+    compliance_params = {
+        'max_trade_size': 0.1,
+        'restricted_dates': pd.to_datetime(['2021-01-01', '2021-07-04'])
+    }
+    
+    results = []
+    
+    for _ in range(num_runs):
+        trader = MultiStrategyTrader(data, risk_params, compliance_params)
+        
+        start_time = time.time()
+        signals = trader.generate_signals()
+        trades = trader.execute_trades(signals)
+        performance = trader.calculate_performance_metrics(trades)
+        end_time = time.time()
+        
+        results.append({
+            'total_return': performance['Total Return'],
+            'sharpe_ratio': performance['Sharpe Ratio'],
+            'max_drawdown': performance['Max Drawdown'],
+            'execution_time': end_time - start_time
+        })
+    
+    return pd.DataFrame(results)
+
+def plot_benchmark_results(results):
+    fig, axs = plt.subplots(2, 2, figsize=(15, 15))
+    
+    axs[0, 0].hist(results['total_return'], bins=20)
+    axs[0, 0].set_title('Distribution of Total Returns')
+    axs[0, 0].set_xlabel('Total Return')
+    axs[0, 0].set_ylabel('Frequency')
+    
+    axs[0, 1].hist(results['sharpe_ratio'], bins=20)
+    axs[0, 1].set_title('Distribution of Sharpe Ratios')
+    axs[0, 1].set_xlabel('Sharpe Ratio')
+    axs[0, 1].set_ylabel('Frequency')
+    
+    axs[1, 0].hist(results['max_drawdown'], bins=20)
+    axs[1, 0].set_title('Distribution of Max Drawdowns')
+    axs[1, 0].set_xlabel('Max Drawdown')
+    axs[1, 0].set_ylabel('Frequency')
+    
+    axs[1, 1].hist(results['execution_time'], bins=20)
+    axs[1, 1].set_title('Distribution of Execution Times')
+    axs[1, 1].set_xlabel('Execution Time (seconds)')
+    axs[1, 1].set_ylabel('Frequency')
+    
+    plt.tight_layout()
+    plt.savefig('benchmark_results.png')
+    plt.close()
+
+if __name__ == '__main__':
+    data = pd.read_csv('test_data.csv', index_col='date', parse_dates=True)
+    benchmark_results = run_benchmark(data)
+    print(benchmark_results.describe())
+    plot_benchmark_results(benchmark_results)
+
+```
+
+4. Documentation Code
+
+Finally, let's create some documentation using Sphinx:
+
+
+
+```python
+# conf.py
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+project = 'Multi-Strategy Trading System'
+copyright = '2024, Your Name'
+author = 'Your Name'
+
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+]
+
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+html_theme = 'sphinx_rtd_theme'
+html_static_path = ['_static']
+
+# index.rst
+.. Multi-Strategy Trading System documentation master file
+
+Welcome to Multi-Strategy Trading System's documentation!
+=========================================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   modules
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+# multi_strategy_trader.rst
+Multi-Strategy Trader Module
+============================
+
+.. automodule:: multi_strategy_trader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+# Generate documentation
+import os
+import sys
+import subprocess
+
+def generate_docs():
+    # Create necessary directories
+    os.makedirs('docs', exist_ok=True)
+    os.makedirs('docs/source', exist_ok=True)
+    
+    # Write conf.py
+    with open('docs/source/conf.py', 'w') as f:
+        f.write(conf_py_content)
+    
+    # Write index.rst
+    with open('docs/source/index.rst', 'w') as f:
+        f.write(index_rst_content)
+    
+    # Write multi_strategy_trader.rst
+    with open('docs/source/multi_strategy_trader.rst', 'w') as f:
+        f.write(multi_strategy_trader_rst_content)
+    
+    # Run sphinx-quickstart
+    subprocess.run(['sphinx-quickstart', 'docs', '--sep', '-p', 'Multi-Strategy Trading System', '-a', 'Your Name', '-v', '0.1', '--ext-autodoc', '--ext-viewcode', '-q'])
+    
+    # Run sphinx-apidoc
+    subprocess.run(['sphinx-apidoc', '-o', 'docs/source', '.'])
+    
+    # Build HTML documentation
+    subprocess.run(['sphinx-build', '-b', 'html', 'docs/source', 'docs/build/html'])
+
+if __name__ == '__main__':
+    generate_docs()
+
+```
+
+This comprehensive set of artifacts covers:
+
+1. Sample test data generation
+2. Pytest test cases for each strategy and the overall system
+3. Benchmark code to evaluate strategy performance
+4. Sphinx documentation setup and generation
+
+To use these:
+
+1. Save the sample test data generator and run it to create your `test_data.csv`.
+2. Place the pytest test cases in a `tests/` directory in your project.
+3. Run the benchmark code periodically to evaluate your strategies' performance.
+4. Set up Sphinx documentation by running the documentation generation script.
+
+Remember to keep your tests, benchmarks, and documentation up-to-date as you modify and improve your trading strategies. Regular testing and benchmarking will help ensure the reliability and performance of your system, while comprehensive documentation will make it easier for team members to understand and contribute to the project.
