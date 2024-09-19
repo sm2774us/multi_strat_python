@@ -1,7 +1,11 @@
 # multi_strat_python
 Multi-Strategy in Python
 
-Certainly! I'll provide a comprehensive implementation of the revamped multi-strategy approach, addressing each of your requirements. Due to the extensive nature of this project, I'll break it down into sections and provide detailed code for each.
+## Investment Problem
+Given a multi asset trading the following assets: interest rates swaps, fixed income futures, interest rate options and foreign exchange, if you are hired as a lead quant researcher and given the objective to increase profitability of portfolio by 50 Million dollars by end of the year. What multi-strat trading strategies would you implement and how would you ensure that your strategy is within the accepted risk profile and is compliant with SEC and Mifid-2 and other compliance regulatory requirements
+
+## Implementation
+Provided below is comprehensive implementation of the multi-strategy approach, addressing the requirements. Due to the extensive nature of this project, I'll break it down into sections and provide detailed code for each.
 
 1. Mathematical and Statistical Details
 
