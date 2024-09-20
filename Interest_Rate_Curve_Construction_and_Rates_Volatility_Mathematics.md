@@ -34,19 +34,23 @@ The key inputs are:
 Given an observable set of market rates for different maturities, we can bootstrap the curve as follows:
 
 1. **Short maturities**: The spot rate $R_1$for a zero-coupon bond maturing at time $T_1$is calculated from its price $P_1$:
+
 $$
 P_1 = \frac{1}{(1 + R_1)^{T_1}}
 $$
 
 Solving for $R_1$, we get:
+
 $$
 R_1 = \left(\frac{1}{P_1}\right)^{\frac{1}{T_1}} - 1
 $$
 
 2. **Longer maturities**: For a bond with periodic coupon payments, we discount future payments using previously derived spot rates. If the bond has a maturity $T_n$and coupon payments $C$, the price is:
+
 $$
 P_n = \sum_{i=1}^{n} \frac{C}{(1 + R_i)^{T_i}} + \frac{1}{(1 + R_n)^{T_n}}
 $$
+
 This allows us to solve for $R_n$, the spot rate at time $T_n$.
 
 ---
