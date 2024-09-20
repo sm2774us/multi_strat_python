@@ -33,7 +33,7 @@ The key inputs are:
 #### Mathematical Representation
 Given an observable set of market rates for different maturities, we can bootstrap the curve as follows:
 
-1. **Short maturities**: The spot rate $R_1$for a zero-coupon bond maturing at time $T_1$is calculated from its price $P_1$:
+1. **Short maturities**: The spot rate $R_1$ for a zero-coupon bond maturing at time $T_1$ is calculated from its price $P_1$:
 
 $$
 P_1 = \frac{1}{(1 + R_1)^{T_1}}
@@ -45,7 +45,7 @@ $$
 R_1 = \left(\frac{1}{P_1}\right)^{\frac{1}{T_1}} - 1
 $$
 
-2. **Longer maturities**: For a bond with periodic coupon payments, we discount future payments using previously derived spot rates. If the bond has a maturity $T_n$and coupon payments $C$, the price is:
+2. **Longer maturities**: For a bond with periodic coupon payments, we discount future payments using previously derived spot rates. If the bond has a maturity $T_n$ and coupon payments $C$, the price is:
 
 $$
 P_n = \sum_{i=1}^{n} \frac{C}{(1 + R_i)^{T_i}} + \frac{1}{(1 + R_n)^{T_n}}
@@ -83,10 +83,10 @@ C = P(0,T)\left[F_0 N(d_1) - K N(d_2)\right]
 $$
 
 Where:
-- $P(0,T)$is the discount factor,
-- $F_0$is the forward rate,
-- $K$is the strike rate,
-- $d_1$and $d_2$are terms involving volatility $\sigma$:
+- $P(0,T)$ is the discount factor,
+- $F_0$ is the forward rate,
+- $K$ is the strike rate,
+- $d_1$ and $d_2$ are terms involving volatility $\sigma$:
 
 $$
 d_1 = \frac{\log\left(\frac{F_0}{K}\right) + \frac{1}{2} \sigma^2 T}{\sigma \sqrt{T}}
@@ -96,20 +96,21 @@ $$
 d_2 = d_1 - \sigma \sqrt{T}
 $$
 
-- $N(\cdot)$is the cumulative normal distribution function.
+- $N(\cdot)$ is the cumulative normal distribution function.
 
 The volatility $\sigma$can be implied from market prices, or forecasted using statistical methods like **GARCH** models or **machine learning** models.
 
 ### GARCH for Volatility Forecasting:
 The **GARCH (Generalized Autoregressive Conditional Heteroskedasticity)** model is widely used to forecast future volatility:
+
 $$
 \sigma_t^2 = \alpha_0 + \alpha_1 \epsilon_{t-1}^2 + \beta_1 \sigma_{t-1}^2
 $$
 
 Where:
-- $\sigma_t^2$is the volatility at time $t$,
-- $\epsilon_{t-1}^2$is the previous period's shock (squared),
-- $\alpha_0, \alpha_1, \beta_1$are model parameters.
+- $\sigma_t^2$ is the volatility at time $t$,
+- $\epsilon_{t-1}^2$ is the previous period's shock (squared),
+- $\alpha_0, \alpha_1, \beta_1$ are model parameters.
 
 The GARCH model accounts for **volatility clustering**, where high-volatility periods tend to follow high-volatility periods.
 
