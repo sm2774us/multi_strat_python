@@ -78,6 +78,7 @@ Volatility is often represented as a **volatility surface**, which maps the vola
 The **Black-Scholes** model for pricing options is commonly used, with volatility as a key parameter:
 
 For a European call option on an interest rate, the price is given by:
+
 $$
 C = P(0,T)\left[F_0 N(d_1) - K N(d_2)\right]
 $$
@@ -98,7 +99,7 @@ $$
 
 - $N(\cdot)$ is the cumulative normal distribution function.
 
-The volatility $\sigma$can be implied from market prices, or forecasted using statistical methods like **GARCH** models or **machine learning** models.
+The volatility $\sigma$ can be implied from market prices, or forecasted using statistical methods like **GARCH** models or **machine learning** models.
 
 ### GARCH for Volatility Forecasting:
 The **GARCH (Generalized Autoregressive Conditional Heteroskedasticity)** model is widely used to forecast future volatility:
